@@ -76,9 +76,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             padding-top: 1.5rem;
-            gap: 80px; /* 간격 넓힘 */
+            gap: 80px;
         }
         
         .avatar-circle {
@@ -98,7 +98,7 @@
         .avatar-male { color: var(--male-color); border-color: #E6F0F9; }
         .avatar-female { color: var(--female-color); border-color: #FBE6EA; }
         
-        /* 결이 이어지는 파동 애니메이션 (하트 대체) */
+        /* 결이 이어지는 파동 애니메이션 */
         .connection-line-bg {
             position: absolute;
             top: 50%;
@@ -264,6 +264,34 @@
             font-size: 14px;
             border: 1px solid #e5e7eb;
         }
+        
+        /* --- New: Special Chemistry Badges --- */
+        .special-badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .chemistry-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transform: scale(0);
+            animation: popInBadge 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes popInBadge { to { transform: scale(1); } }
+        
+        .badge-travel { background: #E0F2FE; color: #0284C7; border: 1px solid #BAE6FD; }
+        .badge-money { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
+        .badge-talk { background: #F3E8FF; color: #7C3AED; border: 1px solid #DDD6FE; }
+        .badge-love { background: #FFE4E6; color: #E11D48; border: 1px solid #FECDD3; }
+        .badge-soul { background: #FFF7ED; color: #EA580C; border: 1px solid #FED7AA; }
+        .badge-lifestyle { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
     </style>
 </head>
 <body class="bg-texture min-h-screen text-gray-800">
@@ -370,10 +398,13 @@
                             <circle id="score-ring-circle" class="score-ring-circle-fg" cx="90" cy="90" r="80"></circle>
                         </svg>
                         <div class="score-text-centered">
-                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">Probability</span>
-                            <span id="match-probability-text" class="text-2xl font-black serif-font text-gray-800">0%</span>
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">Destiny Rate</span>
+                            <span id="match-probability-text" class="text-3xl font-black serif-font text-gray-800">0%</span>
                         </div>
                     </div>
+
+                    <!-- 스페셜 케미 뱃지 (NEW) -->
+                    <div id="special-badges" class="special-badges-container"></div>
 
                     <!-- 확률 설명 박스 -->
                     <div class="prob-box mx-auto max-w-xs mb-8">
@@ -734,7 +765,6 @@
             
             let rarityScore = 0;
             if (data.exactMatchCount > 0) {
-                // 12개만 맞아도 시각적으로 꽉 차 보이게 (기적적인 확률이므로)
                 rarityScore = (data.exactMatchCount / 12) * 100;
                 rarityScore = Math.min(100, rarityScore); 
             }
@@ -747,6 +777,31 @@
                 matchText.innerText = data.probabilityText; 
                 matchText.classList.add('text-xl'); 
             }, 300);
+            
+            // --- 스페셜 뱃지 생성 로직 ---
+            const badgesContainer = document.getElementById('special-badges');
+            badgesContainer.innerHTML = '';
+            
+            const matchedIds = data.details.exactMatches.map(m => m.id); // ID 목록 추출
+            
+            if (matchedIds.includes('q22') || matchedIds.includes('q28') || matchedIds.includes('q29')) {
+                badgesContainer.innerHTML += `<span class="chemistry-badge badge-travel">✈️ 여행&데이트 찰떡</span>`;
+            }
+            if (matchedIds.includes('q11') || matchedIds.includes('q13') || matchedIds.includes('q31')) {
+                badgesContainer.innerHTML += `<span class="chemistry-badge badge-money">💰 슈퍼 리치 커플</span>`;
+            }
+            if (matchedIds.includes('q19') || matchedIds.includes('q32')) {
+                badgesContainer.innerHTML += `<span class="chemistry-badge badge-talk">🥂 환상의 티키타카</span>`;
+            }
+            if (matchedIds.includes('q4') || matchedIds.includes('q23') || matchedIds.includes('q26')) {
+                badgesContainer.innerHTML += `<span class="chemistry-badge badge-love">🔥 로맨틱 DNA</span>`;
+            }
+            if (matchedIds.includes('q12') || matchedIds.includes('q24')) {
+                badgesContainer.innerHTML += `<span class="chemistry-badge badge-soul">👨‍👩‍👧‍👦 가족관 일치</span>`;
+            }
+            if (data.exactMatchCount >= 15) {
+                 badgesContainer.innerHTML += `<span class="chemistry-badge badge-lifestyle">🦄 0.1% 천생연분</span>`;
+            }
 
             document.getElementById('result-group-name-male').innerText = sensoryProfiles[mDom].name;
             document.getElementById('result-group-description-male').innerText = sensoryProfiles[mDom].description;
@@ -874,6 +929,7 @@
                             scores.sim += 4; 
                             exactMatchCount++; 
                             details.exactMatches.push({
+                                id: q.id, // ID 추가 (뱃지용)
                                 question: q.text,
                                 answer: m.dataset.text.trim()
                             });
@@ -899,6 +955,7 @@
                         if(mp && mp.value === f.value && fp && fp.value === m.value) {
                              exactMatchCount++; 
                              details.exactMatches.push({
+                                id: q.id, // ID 추가
                                 question: q.text_me,
                                 answer: `서로가 원하는 바가 정확히 일치`
                             });
