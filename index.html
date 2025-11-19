@@ -55,9 +55,8 @@
             border-color: var(--accent-gold);
             color: #5A4D3B;
             font-weight: 600;
-            box-shadow: inset 0 0 0 1px var(--accent-gold); /* 테두리 강조 */
+            box-shadow: inset 0 0 0 1px var(--accent-gold);
         }
-        /* 체크 표시 아이콘 */
         .hidden-radio:checked + .option-label::before {
             content: '✔';
             position: absolute;
@@ -105,7 +104,7 @@
             display: inline-flex;
             align-items: center;
             padding: 2px 8px;
-            border-radius: 9999px;
+            border-radius: 4px;
             font-size: 0.7rem;
             font-weight: 700;
             margin-left: 8px;
@@ -118,15 +117,26 @@
         .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
         
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-500 { animation-delay: 0.5s; }
-
         .text-gradient {
             background: linear-gradient(45deg, var(--male-color), var(--female-color));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+        
+        /* 매칭 확률 바 스타일 */
+        .prob-bar-bg {
+            width: 100%;
+            height: 10px;
+            background-color: #f3f4f6;
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .prob-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #5D7D9A, #D67D88);
+            width: 0%;
+            transition: width 1.5s ease-out;
         }
         
         .tarot-card-lg {
@@ -149,6 +159,15 @@
             color: white;
             text-align: center;
         }
+        
+        /* 상세 매칭 리스트 아이템 */
+        .match-item {
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .match-item.perfect { border-left-color: #F59E0B; background-color: #FFFBEB; }
+        .match-item.texture { border-left-color: #3B82F6; background-color: #EFF6FF; }
+        .match-item:hover { transform: translateX(5px); }
     </style>
 </head>
 <body class="bg-texture min-h-screen text-gray-800">
@@ -158,7 +177,7 @@
             <div class="text-2xl font-black serif-font tracking-tighter cursor-pointer" onclick="window.location.reload()">
                 결<span class="text-sm font-light text-gray-400 ml-1 font-sans">하다</span>
             </div>
-            <div class="text-xs text-gray-500 tracking-widest uppercase hidden md:block">Relationship Texture Test</div>
+            <div class="text-xs text-gray-500 tracking-widest hidden md:block">서로의 결을 잇다</div>
         </div>
     </nav>
 
@@ -198,10 +217,9 @@
                 </div>
             </div>
 
-            <!-- 하단 컨트롤 바 (중앙 정렬 수정됨) -->
+            <!-- 하단 컨트롤 바 -->
             <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t p-4 z-40 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
                 <div class="max-w-5xl mx-auto relative flex justify-center items-center">
-                    <!-- 경고 메시지는 절대 위치로 배치하여 중앙 정렬을 방해하지 않음 -->
                     <div id="warning-message" class="absolute -top-10 left-0 right-0 text-center text-red-500 text-sm font-bold bg-white py-1 hidden animate-bounce">
                         ⚠️ 모든 질문에 답변해주세요!
                     </div>
@@ -220,58 +238,77 @@
 
         <div id="results" class="hidden">
             
-            <!-- A. 메인 결과 티켓 (점수 제거 버전) -->
+            <!-- A. 메인 결과 티켓 -->
             <div class="max-w-3xl mx-auto fade-in-up">
                 <div class="couple-ticket p-8 md:p-12 rounded-3xl text-center">
-                    <div class="uppercase tracking-widest text-xs text-gray-400 mb-6">GyolHada Analysis</div>
+                    <div class="uppercase tracking-widest text-xs text-gray-400 mb-6">결하다 관계 분석 리포트</div>
                     
                     <h2 id="couple-title" class="text-3xl md:text-5xl font-black serif-font text-gray-800 mb-4 break-keep leading-tight"></h2>
                     
-                    <!-- 결과 키워드 비주얼 (점수 대체) -->
-                    <div class="relative h-48 w-full flex justify-center items-center mb-8">
-                        <div class="absolute w-40 h-40 rounded-full bg-blue-500 mix-blend-multiply filter blur-2xl opacity-20 animate-pulse" style="left: 50%; transform: translateX(-70%);"></div>
-                        <div class="absolute w-40 h-40 rounded-full bg-pink-500 mix-blend-multiply filter blur-2xl opacity-20 animate-pulse delay-100" style="left: 50%; transform: translateX(-30%);"></div>
-                        
-                        <div class="relative z-10">
-                            <div class="inline-block border-y-2 border-gray-800 py-2 px-6">
-                                <span id="result-keyword" class="text-2xl md:text-3xl font-bold serif-font text-gray-800 tracking-widest"></span>
-                            </div>
-                            <div class="text-xs font-medium text-gray-400 mt-3 uppercase tracking-widest">Relationship Texture Type</div>
+                    <!-- 매칭 확률 비주얼 -->
+                    <div class="my-10 max-w-sm mx-auto">
+                        <div class="flex justify-between items-end mb-2">
+                            <span class="text-sm font-bold text-gray-500 uppercase tracking-wider">매칭 확률</span>
+                            <span id="match-probability-text" class="text-4xl font-black serif-font text-gray-800">0%</span>
                         </div>
+                        <div class="prob-bar-bg">
+                            <div id="match-probability-bar" class="prob-bar-fill"></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2 text-right">두 분의 답변 패턴을 기반으로 분석된 수치입니다.</p>
+                    </div>
+
+                    <div class="relative z-10 mb-8">
+                        <div class="inline-block border-y-2 border-gray-800 py-3 px-8">
+                            <span id="result-keyword" class="text-xl md:text-2xl font-bold serif-font text-gray-800 tracking-widest"></span>
+                        </div>
+                        <div class="text-xs font-medium text-gray-400 mt-3 uppercase tracking-widest">Relationship Texture Type</div>
                     </div>
 
                     <div class="ticket-dashed-line"></div>
 
+                    <!-- 상세 분석 코멘트 -->
                     <div class="bg-gray-50 p-8 rounded-2xl text-gray-700 leading-loose break-keep text-left border border-gray-100">
-                        <h4 class="font-bold text-gray-800 mb-3 text-lg serif-font flex items-center">
-                            <span class="text-xl mr-2">💬</span> 분석 코멘트
+                        <h4 class="font-bold text-gray-800 mb-4 text-lg serif-font flex items-center border-b border-gray-200 pb-2">
+                            <span class="text-xl mr-2">💬</span> 심층 분석 리포트
                         </h4>
-                        <p id="result-one-liner" class="text-sm md:text-base font-light"></p>
+                        <div id="result-one-liner" class="space-y-4 text-sm md:text-base font-light"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- B. Perfect Match 하이라이트 -->
-            <div id="perfect-match-section" class="mt-12 max-w-3xl mx-auto fade-in-up delay-100 hidden">
-                <div class="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-yellow-300 rounded-full blur-2xl opacity-30"></div>
-                    
-                    <h3 class="text-xl font-bold text-amber-900 serif-font mb-4 flex items-center">
-                        <span class="text-2xl mr-2">✨</span> 완벽하게 통하는 부분
-                    </h3>
-                    <p class="text-sm text-amber-800/70 mb-6">
-                        두 분이 말하지 않아도 통하는 <span class="font-bold underline">결정적인 연결고리</span>입니다.
-                    </p>
-                    
-                    <ul id="perfect-match-list" class="space-y-3"></ul>
+            <!-- B. 상세 매칭 분석 (NEW) -->
+            <div id="match-detail-section" class="mt-16 max-w-4xl mx-auto fade-in-up delay-100">
+                <div class="text-center mb-10">
+                    <span class="text-amber-500 text-xs font-bold tracking-widest uppercase mb-2 block">Matching DNA</span>
+                    <h3 class="text-2xl md:text-3xl font-bold serif-font text-gray-800">우리가 통하는 순간들</h3>
+                    <p class="text-gray-500 text-sm mt-2">두 분의 답변이 어떻게 연결되었는지 확인해보세요.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 완전 일치 -->
+                    <div class="bg-white p-6 rounded-2xl border border-orange-100 shadow-sm">
+                        <h4 class="font-bold text-amber-600 mb-4 flex items-center">
+                            <span class="text-xl mr-2">💎</span> 완전 일치 (Perfect Match)
+                        </h4>
+                        <p class="text-xs text-gray-400 mb-4">질문과 답변 선택까지 완벽하게 똑같은 항목입니다.</p>
+                        <ul id="perfect-match-list" class="space-y-3 text-sm"></ul>
+                    </div>
+
+                    <!-- 성향 일치 -->
+                    <div class="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm">
+                        <h4 class="font-bold text-blue-600 mb-4 flex items-center">
+                            <span class="text-xl mr-2">🧩</span> 성향 일치 (Texture Match)
+                        </h4>
+                        <p class="text-xs text-gray-400 mb-4">답변은 달라도 추구하는 가치관(결)이 같은 항목입니다.</p>
+                        <ul id="texture-match-list" class="space-y-3 text-sm"></ul>
+                    </div>
                 </div>
             </div>
 
             <!-- C. 상세 프로필 -->
             <div class="mt-16 fade-in-up delay-200">
                 <div class="text-center mb-10">
-                    <h3 class="text-3xl font-bold serif-font text-gray-800">각자의 '결' 모양</h3>
-                    <p class="text-gray-500 text-sm mt-2">두 사람의 성향이 어떻게 겹치고 다른지 확인해보세요.</p>
+                    <h3 class="text-3xl font-bold serif-font text-gray-800">각자의 '결' 상세 분석</h3>
                 </div>
                 
                 <div class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 max-w-5xl mx-auto">
@@ -284,7 +321,7 @@
                                 <div class="flex items-center mb-3">
                                     <span class="text-3xl mr-3">🤵‍♂️</span>
                                     <div>
-                                        <span class="text-xs font-bold text-blue-400 uppercase">Male Type</span>
+                                        <span class="text-xs font-bold text-blue-400 uppercase">남자의 결</span>
                                         <h4 id="result-group-name-male" class="text-lg font-bold text-blue-900 serif-font"></h4>
                                     </div>
                                 </div>
@@ -294,7 +331,7 @@
                                 <div class="flex items-center mb-3">
                                     <span class="text-3xl mr-3">👰‍♀️</span>
                                     <div>
-                                        <span class="text-xs font-bold text-pink-400 uppercase">Female Type</span>
+                                        <span class="text-xs font-bold text-pink-400 uppercase">여자의 결</span>
                                         <h4 id="result-group-name-female" class="text-lg font-bold text-pink-900 serif-font"></h4>
                                     </div>
                                 </div>
@@ -305,38 +342,27 @@
                 </div>
             </div>
 
-            <!-- D. 타로 & 궁합 해석 -->
+            <!-- D. 타로 -->
             <div class="mt-20 fade-in-up delay-300 bg-gray-900 text-white py-16 px-4 -mx-4 md:rounded-3xl md:mx-auto max-w-6xl relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-                <div class="absolute top-0 left-0 w-64 h-64 bg-purple-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-                <div class="absolute bottom-0 right-0 w-64 h-64 bg-indigo-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
-
                 <div class="relative z-10 max-w-4xl mx-auto">
                     <div class="text-center mb-12">
-                        <span class="text-amber-400 text-xs font-bold tracking-widest uppercase mb-2 block">Tarot Reading</span>
+                        <span class="text-amber-400 text-xs font-bold tracking-widest uppercase mb-2 block">타로 리딩</span>
                         <h3 class="text-3xl md:text-4xl font-bold serif-font text-white">두 분의 영적 궁합</h3>
                     </div>
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
                         <div class="grid grid-cols-2 gap-4">
                             <div class="text-center">
                                 <div id="male-tarot-img" class="tarot-card-lg mb-3">
-                                    <div class="tarot-overlay">
-                                        <div class="text-xs uppercase tracking-wider opacity-80">Male</div>
-                                        <div id="male-tarot-name" class="font-bold serif-font text-lg"></div>
-                                    </div>
+                                    <div class="tarot-overlay"><div id="male-tarot-name" class="font-bold serif-font text-lg"></div></div>
                                 </div>
                             </div>
                             <div class="text-center">
                                 <div id="female-tarot-img" class="tarot-card-lg mb-3">
-                                    <div class="tarot-overlay">
-                                        <div class="text-xs uppercase tracking-wider opacity-80">Female</div>
-                                        <div id="female-tarot-name" class="font-bold serif-font text-lg"></div>
-                                    </div>
+                                    <div class="tarot-overlay"><div id="female-tarot-name" class="font-bold serif-font text-lg"></div></div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="space-y-8">
                             <div>
                                 <h4 class="text-xl font-bold text-amber-200 serif-font mb-3 border-b border-gray-700 pb-2">🔮 카드 해석</h4>
@@ -361,7 +387,7 @@
     </div>
 
     <script>
-        // --- 1. 데이터 (질문 리스트 동일) ---
+        // --- 1. 데이터 ---
         const questions = [
              { id: 'q1', type: 'similarity', brainType: 'Action (행동)', text: '인스타그램 스토리에 사진을 올린다면?', options: [ { value: '1', text: '아름다운 자연 풍경 (경험중시)', tag: '#경험중시형'}, { value: '2', text: '고급 레스토랑 음식 (성취지향)', tag: '#성취지향형'}, { value: '3', text: '친구들과의 파티 (사교형)', tag: '#사교형'}, { value: '4', text: '잘 올리지 않음 (안정지향)', tag: '#안정지향형'} ] },
              { id: 'q2', type: 'similarity', brainType: 'Action (행동)', text: '선호하는 운동 스타일은?', options: [ { value: '1', text: '혼자 집중하는 운동 (러닝, 헬스)', tag: '#자기계발형'}, { value: '2', text: '팀이나 파트너와 함께 (테니스)', tag: '#활동적인'}, { value: '3', text: '운동은 별로 즐기지 않음', tag: '#정적인'} ] },
@@ -410,7 +436,6 @@
             ADAPTIVE_BALANCED: { name: "Temperance", img: "https://upload.wikimedia.org/wikipedia/ko/f/f8/RWS_Tarot_14_Temperance.jpg" }
         };
 
-        // 상세한 타로 해석 데이터 (내부 DB)
         const tarotReadings = {
             'EMOTIONAL_CONNECT_EMOTIONAL_CONNECT': "두 분은 '연인' 카드처럼 서로의 마음을 거울처럼 비추는 관계입니다. 말하지 않아도 통하는 깊은 유대감을 가졌지만, 때로는 감정에 휩쓸려 현실적인 문제를 놓칠 수 있으니 주의하세요.",
             'PRACTICAL_RATIONAL_PRACTICAL_RATIONAL': "두 분은 '정의' 카드처럼 공정하고 명확한 관계입니다. 오해 없는 깔끔한 소통이 강점이지만, 너무 옳고 그름을 따지다 보면 정서적인 교감이 메말라버릴 수 있습니다.",
@@ -421,7 +446,6 @@
             'DEFAULT': "서로 다른 매력을 가진 두 분이 만났습니다. 서로의 차이를 '틀림'이 아닌 '다름'으로 받아들일 때, 이 관계는 서로의 세계를 넓혀주는 가장 훌륭한 여행이 될 것입니다."
         };
 
-        // --- DOM Elements & Render ---
         const maleContainer = document.getElementById('male-questions');
         const femaleContainer = document.getElementById('female-questions');
         let totalQuestions = 0;
@@ -517,7 +541,6 @@
             femaleContainer.innerHTML = femaleHTML;
         }
 
-        // 랜덤 버튼
         document.getElementById('random-btn').addEventListener('click', () => {
             document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
             const groups = {}; 
@@ -543,10 +566,11 @@
             }, 100);
         });
 
-        // --- 결과 계산 및 표시 ---
+        // --- 결과 계산 ---
         document.getElementById('calculate-btn').addEventListener('click', () => {
             const scores = { sim: 0, pref: 0, shape: 0 };
-            const details = { sim: [], pref: [], perfect: [] };
+            // 매칭 상세 정보를 담을 객체
+            const details = { exactMatches: [], textureMatches: [] };
             const maleCounts = {}, femaleCounts = {};
             
             questions.forEach(q => {
@@ -559,28 +583,45 @@
                     if(mGroup) maleCounts[mGroup] = (maleCounts[mGroup]||0)+1;
                     if(fGroup) femaleCounts[fGroup] = (femaleCounts[fGroup]||0)+1;
                     
-                    let isPerfect = false;
-
-                    // Similarity Logic
+                    // Similarity & Detailed Match Logic
                     if(q.type === 'similarity') {
-                        if(m.value === f.value) { scores.sim += 4; isPerfect = true; } 
-                        else if(mGroup === fGroup) { scores.sim += 3; }
+                        if(m.value === f.value) { 
+                            scores.sim += 4; 
+                            details.exactMatches.push({
+                                question: q.text,
+                                answer: m.dataset.text.split('(')[0].trim(), // 텍스트 정리
+                                type: 'Action' // 임시
+                            });
+                        } 
+                        else if(mGroup === fGroup) { 
+                            scores.sim += 3; 
+                            details.textureMatches.push({
+                                question: q.text,
+                                maleAnswer: m.dataset.text.split('(')[0].trim(),
+                                femaleAnswer: f.dataset.text.split('(')[0].trim()
+                            });
+                        }
                     }
                     
-                    // Preference Logic (Crossover)
+                    // Preference Logic
                     if(q.type === 'crossover') {
                         const mp = document.querySelector(`input[name="${q.id}-partner-male"]:checked`);
                         const fp = document.querySelector(`input[name="${q.id}-partner-female"]:checked`);
                         let prefScore = 0;
                         let pMatch = false;
-                        
                         if(mp && mp.value === f.value) { prefScore += 8; pMatch = true; }
                         if(fp && fp.value === m.value) { prefScore += 8; pMatch = true; }
-
                         scores.pref += prefScore;
-                        if(pMatch && mp.value === f.value && fp.value === m.value) isPerfect = true; 
+                        
+                        // 크로스오버 완전 일치 (내가 원하는 걸 상대가 가지고 있을 때)
+                        if(mp && mp.value === f.value && fp && fp.value === m.value) {
+                             details.exactMatches.push({
+                                question: q.text_me,
+                                answer: `서로가 원하는 '${m.dataset.text.split('(')[0].trim()}' & '${f.dataset.text.split('(')[0].trim()}' 성향 보유`,
+                                type: 'Emotion'
+                            });
+                        }
                     }
-
                     if(q.type === 'dynamic') {
                         const mf = document.querySelector(`input[name="${q.id}-followup-male"]:checked`);
                         const ff = document.querySelector(`input[name="${q.id}-followup-female"]:checked`);
@@ -588,10 +629,6 @@
                         if(mf && mf.value === f.value) dScore += parseInt(mf.dataset.score||4);
                         if(ff && ff.value === m.value) dScore += parseInt(ff.dataset.score||4);
                         scores.pref += dScore;
-                    }
-
-                    if(isPerfect || (q.type === 'similarity' && m.value === f.value)) {
-                        details.perfect.push({ text: q.type==='crossover' ? q.text_me : q.text });
                     }
                 }
             });
@@ -611,7 +648,7 @@
             showResults({
                 total: Math.round(totalScore),
                 maleCounts, femaleCounts,
-                details
+                details // 매칭 상세 정보 전달
             });
         });
 
@@ -621,6 +658,51 @@
             }
             return null;
         }
+        
+        // 상세 분석 텍스트 생성 함수
+        function generateAnalysisText(score, mDom, fDom) {
+            let title = "", text = "";
+            
+            if(score >= 85) {
+                title = "영혼까지 닮은 데칼코마니";
+                text = `
+                    <p class="mb-2 font-bold text-indigo-700">"말하지 않아도 통하는 천생연분"</p>
+                    <p class="mb-4">두 분은 놀라울 정도로 비슷한 '결'을 가지고 있습니다. 세상을 바라보는 가치관, 감정을 표현하는 방식, 심지어 주말을 보내는 사소한 습관까지 닮아있네요. 마치 오래된 거울을 보는 것처럼 서로에게서 자신의 모습을 발견하며 깊은 편안함을 느낄 것입니다.</p>
+                    <p class="text-sm bg-indigo-50 p-3 rounded-lg">💡 <b>Tip:</b> 너무 비슷해서 권태로움을 느낄 수도 있습니다. 가끔은 의도적으로 서로 다른 취미를 공유하며 신선한 자극을 주는 것이 관계를 더욱 단단하게 만듭니다.</p>
+                `;
+            } else if(score >= 70) {
+                title = "서로에게 스며드는 물감";
+                text = `
+                    <p class="mb-2 font-bold text-pink-600">"다름이 매력이 되는 조화로운 관계"</p>
+                    <p class="mb-4">두 분은 서로 다른 색을 가졌지만, 섞이면 더 아름다운 색이 되는 물감 같습니다. 기본적인 신뢰와 가치관은 공유하면서도, 각자의 개성이 뚜렷해 서로에게 끊임없이 영감을 줍니다. 남자의 부족한 점을 여자가 채워주고, 여자의 빈틈을 남자가 감싸주는 '상호보완적'인 관계의 정석입니다.</p>
+                    <p class="text-sm bg-pink-50 p-3 rounded-lg">💡 <b>Tip:</b> 서로의 다름을 '틀림'으로 오해하지 않도록 주의하세요. 지금처럼 서로의 차이를 인정하고 배려한다면 가장 이상적인 커플이 될 것입니다.</p>
+                `;
+            } else if(score >= 50) {
+                title = "맞춰가는 퍼즐 조각";
+                text = `
+                    <p class="mb-2 font-bold text-green-600">"노력할수록 완벽해지는 사이"</p>
+                    <p class="mb-4">아직은 서로의 모서리가 조금 뾰족할 수 있지만, 그렇기에 딱 맞물렸을 때 더 견고한 결합을 만들어냅니다. 두 분은 서로 다른 환경에서 자라 다른 '결'을 가졌지만, 서로를 향한 호기심과 이해하려는 마음이 큽니다. 지금 겪는 작은 마찰들은 서로에게 꼭 맞는 모양이 되어가는 과정입니다.</p>
+                    <p class="text-sm bg-green-50 p-3 rounded-lg">💡 <b>Tip:</b> '왜 나랑 다르지?'라고 생각하기보다 '이런 점은 배울 수 있겠구나'라고 생각해보세요. 대화의 시간이 늘어날수록 매칭 점수는 기하급수적으로 올라갈 것입니다.</p>
+                `;
+            } else {
+                title = "자석 같은 N극과 S극";
+                text = `
+                    <p class="mb-2 font-bold text-amber-600">"서로 정반대라 더 강렬하게 끌리는 매력"</p>
+                    <p class="mb-4">두 분은 마치 N극과 S극처럼 정반대의 성향을 가지고 있습니다. 그래서 처음엔 강렬하게 끌렸을지도 모릅니다. 내가 가지지 못한 모습을 상대방에게서 발견하며 경이로움을 느끼지만, 동시에 이해할 수 없는 부분 때문에 답답함을 느낄 수도 있습니다. 하지만 걱정 마세요. 이 차이가 서로의 세상을 두 배로 넓혀줄 테니까요.</p>
+                    <p class="text-sm bg-amber-50 p-3 rounded-lg">💡 <b>Tip:</b> 상대방을 내 방식대로 바꾸려 하지 마세요. 그저 있는 그대로 인정해줄 때, 두 분은 누구보다 다채롭고 흥미로운 연애를 할 수 있습니다.</p>
+                `;
+            }
+            
+            // 결 보완 설명 추가
+            let complementText = "";
+            if(mDom === fDom) {
+                complementText = `<br><p class="mt-4 border-t pt-4"><b>🤝 서로를 채워주는 결:</b> 두 분 모두 <b>'${sensoryProfiles[mDom].name}'</b>을 공유하고 있어 갈등 상황에서 해결 방식이 매우 비슷합니다. 이는 큰 장점이지만, 둘 다 감정적일 때 브레이크를 걸어줄 사람이 없을 수 있습니다. 한 분이 감정적일 때 다른 분이 이성적인 역할을 의식적으로 맡아주세요.</p>`;
+            } else {
+                complementText = `<br><p class="mt-4 border-t pt-4"><b>🤝 서로를 채워주는 결:</b> <b>'${sensoryProfiles[mDom].name}'</b>을 가진 남자는 <b>'${sensoryProfiles[fDom].name}'</b>을 가진 여자의 결정을 현실적으로 지지해줄 수 있습니다. 반대로 여자는 남자가 놓치기 쉬운 섬세한 감정의 영역을 채워줄 수 있습니다.</p>`;
+            }
+            
+            return { title, text: text + complementText };
+        }
 
         function showResults(data) {
             document.getElementById('question-section').classList.add('hidden');
@@ -628,36 +710,30 @@
             document.getElementById('results').classList.remove('hidden');
             window.scrollTo(0, 0);
 
-            // 점수 대신 텍스트 변환 로직
-            let resultKeyword = "";
-            let title = "", sub = "";
-            
-            if (data.total >= 85) { 
-                resultKeyword = "하나로 이어지는 결";
-                title = "영혼까지 닮은 데칼코마니"; 
-            } else if (data.total >= 70) { 
-                resultKeyword = "부드럽게 어우러진 결";
-                title = "서로에게 스며드는 물감"; 
-            } else if (data.total >= 50) { 
-                resultKeyword = "서로를 채워주는 결";
-                title = "맞춰가는 퍼즐 조각"; 
-            } else { 
-                resultKeyword = "새로운 자극을 주는 결";
-                title = "자석 같은 N극과 S극"; 
-            }
-
-            document.getElementById('result-keyword').innerText = resultKeyword;
-            document.getElementById('couple-title').innerText = title;
-
-            // 프로필 설정
             const getDominant = (counts) => Object.keys(counts).length ? Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b) : 'ADAPTIVE_BALANCED';
             const mDom = getDominant(data.maleCounts);
             const fDom = getDominant(data.femaleCounts);
-            
-            let oneLiner = "";
-            if(mDom === fDom) oneLiner = `두 분은 모두 <b>'${sensoryProfiles[mDom].name}'</b>을 핵심 성향으로 가지고 있습니다. 세상을 바라보는 시선이 비슷해 편안함을 느끼지만, 가끔은 너무 같아서 지루할 수도 있습니다. 서로의 거울 같은 모습을 아껴주세요.`;
-            else oneLiner = `남자는 <b>'${sensoryProfiles[mDom].name}'</b>, 여자는 <b>'${sensoryProfiles[fDom].name}'</b>을 가졌습니다. 서로 다른 무늬가 만나 더 아름다운 그림이 됩니다. 남자의 장점이 여자의 부족함을 채워주고, 여자의 강점이 남자를 이끌어주는 상호보완적인 관계입니다.`;
-            document.getElementById('result-one-liner').innerHTML = oneLiner;
+
+            // 1. 분석 텍스트 생성 (상세)
+            const analysis = generateAnalysisText(data.total, mDom, fDom);
+
+            document.getElementById('result-keyword').innerText = analysis.title;
+            document.getElementById('couple-title').innerText = analysis.title;
+            document.getElementById('result-one-liner').innerHTML = analysis.text;
+
+            // 2. 매칭 확률 바 업데이트
+            const probBar = document.getElementById('match-probability-bar');
+            const probText = document.getElementById('match-probability-text');
+            // 애니메이션 효과
+            setTimeout(() => {
+                probBar.style.width = `${data.total}%`;
+                let current = 0;
+                const interval = setInterval(() => {
+                    current += 1;
+                    probText.innerText = `${current}%`;
+                    if(current >= data.total) clearInterval(interval);
+                }, 15); // 속도 조절
+            }, 300);
 
             document.getElementById('result-group-name-male').innerText = sensoryProfiles[mDom].name;
             document.getElementById('result-group-description-male').innerText = sensoryProfiles[mDom].description;
@@ -666,25 +742,40 @@
 
             drawRadar(data.maleCounts, data.femaleCounts);
 
-            // Perfect Match List
-            const pmList = document.getElementById('perfect-match-list');
-            const pmSection = document.getElementById('perfect-match-section');
-            pmList.innerHTML = '';
-            
-            if(data.details.perfect.length > 0) {
-                pmSection.classList.remove('hidden');
-                data.details.perfect.forEach(item => {
+            // 3. 상세 매칭 리스트 렌더링
+            const renderMatchList = (list, containerId, type) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                if(list.length === 0) {
+                    container.innerHTML = '<li class="text-gray-400 italic">해당하는 항목이 없습니다.</li>';
+                    return;
+                }
+                list.forEach(item => {
                     const li = document.createElement('li');
-                    li.className = 'bg-white/80 p-3 rounded-lg border border-amber-200/50 flex justify-between items-center text-sm';
-                    li.innerHTML = `
-                        <span class="text-gray-700 font-medium truncate mr-2 flex-1">Q. ${item.text}</span>
-                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded shrink-0">일치!</span>
-                    `;
-                    pmList.appendChild(li);
+                    li.className = `match-item ${type} p-3 rounded-lg mb-2`;
+                    
+                    if(type === 'perfect') {
+                        li.innerHTML = `
+                            <div class="font-bold text-gray-700 mb-1">Q. ${item.question}</div>
+                            <div class="text-amber-700 bg-amber-100 inline-block px-2 py-0.5 rounded text-xs">
+                                A. ${item.answer}
+                            </div>
+                        `;
+                    } else {
+                        li.innerHTML = `
+                            <div class="font-bold text-gray-700 mb-1">Q. ${item.question}</div>
+                            <div class="flex flex-col gap-1 text-xs">
+                                <span class="text-blue-600">🤵‍♂️ ${item.maleAnswer}</span>
+                                <span class="text-pink-600">👰‍♀️ ${item.femaleAnswer}</span>
+                            </div>
+                        `;
+                    }
+                    container.appendChild(li);
                 });
-            } else {
-                pmSection.classList.add('hidden');
-            }
+            };
+            
+            renderMatchList(data.details.exactMatches, 'perfect-match-list', 'perfect');
+            renderMatchList(data.details.textureMatches, 'texture-match-list', 'texture');
 
             // Tarot
             const mTarot = tarotMap[mDom];
