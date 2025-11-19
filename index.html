@@ -6,7 +6,7 @@
     <title>결하다 - 우리 둘만의 고유한 '결' 찾기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-bg: #FDFBF7;
@@ -39,7 +39,6 @@
             border-color: var(--accent-gold);
         }
         
-        /* 라디오 버튼 숨김 및 선택 스타일 (원형 점 제거) */
         input[type="radio"].hidden-radio {
             appearance: none;
             -webkit-appearance: none;
@@ -71,73 +70,156 @@
             transition: all 0.2s ease;
         }
 
-        /* 결과 페이지 티켓 스타일 */
-        .couple-ticket {
-            background: white;
-            border: 1px solid #E5E7EB;
+        /* Visual Match Result Styles */
+        .couple-visual-container {
             position: relative;
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .couple-ticket::before, .couple-ticket::after {
-            content: '';
-            position: absolute;
-            height: 40px;
-            width: 40px;
-            background-color: var(--primary-bg);
-            border-radius: 50%;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            box-shadow: inset 2px 0 5px rgba(0,0,0,0.05);
-        }
-        .couple-ticket::before { left: -20px; }
-        .couple-ticket::after { right: -20px; }
-        .ticket-dashed-line {
-            border-top: 2px dashed #E5E7EB;
-            margin: 2rem 0;
-            position: relative;
-        }
-
-        /* 뱃지 */
-        .match-badge {
-            display: inline-flex;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            margin-left: 8px;
-            transform: translateY(-1px);
+            margin-bottom: 2rem;
+            padding-top: 1.5rem;
+            gap: 80px; /* 간격 넓힘 */
         }
-        .match-perfect { background-color: #FFF7ED; color: #D97706; border: 1px solid #FCD34D; }
-        .match-texture { background-color: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+        
+        .avatar-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 10;
+            border: 3px solid white;
+        }
+        .avatar-male { color: var(--male-color); border-color: #E6F0F9; }
+        .avatar-female { color: var(--female-color); border-color: #FBE6EA; }
+        
+        /* 결이 이어지는 파동 애니메이션 (하트 대체) */
+        .connection-line-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 2px;
+            background: #f0f0f0;
+            z-index: 1;
+        }
+        
+        .connection-wave-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 40px;
+            overflow: hidden;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+        }
+        
+        .connection-wave {
+            width: 200%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--male-color) 0%,
+                var(--female-color) 50%,
+                var(--male-color) 100%
+            );
+            filter: blur(0.5px);
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            animation: flowWave 3s linear infinite;
+        }
+        
+        .connection-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 20px;
+            z-index: 3;
+        }
+        .particle {
+            position: absolute;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat 2s infinite;
+        }
+        
+        @keyframes flowWave {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateX(-40px) scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateX(40px) scale(0); opacity: 0; }
+        }
 
-        /* 애니메이션 */
+        .score-ring-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto;
+        }
+        .score-ring-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+        .score-ring-circle-bg {
+            fill: none;
+            stroke: #F3F4F6;
+            stroke-width: 8;
+        }
+        .score-ring-circle-fg {
+            fill: none;
+            stroke: url(#gradientMatch);
+            stroke-width: 8;
+            stroke-dasharray: 502;
+            stroke-dashoffset: 502;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 2s ease-out;
+        }
+        .score-text-centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .result-card-mobile {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .match-item {
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .match-item.perfect { border-left-color: #F59E0B; background-color: #FFFBEB; }
+        .match-item.texture { border-left-color: #3B82F6; background-color: #EFF6FF; }
+
         .fade-in-up { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-        
-        .text-gradient {
-            background: linear-gradient(45deg, var(--male-color), var(--female-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        /* 매칭 확률 바 스타일 */
-        .prob-bar-bg {
-            width: 100%;
-            height: 10px;
-            background-color: #f3f4f6;
-            border-radius: 9999px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        .prob-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #5D7D9A, #D67D88);
-            width: 0%;
-            transition: width 1.5s ease-out;
-        }
         
         .tarot-card-lg {
             width: 100%;
@@ -150,7 +232,6 @@
             position: relative;
             overflow: hidden;
         }
-        .tarot-card-lg:hover { transform: translateY(-5px) scale(1.02); }
         .tarot-overlay {
             position: absolute;
             bottom: 0; left: 0; right: 0;
@@ -160,14 +241,29 @@
             text-align: center;
         }
         
-        /* 상세 매칭 리스트 아이템 */
-        .match-item {
-            border-left: 3px solid transparent;
-            transition: all 0.3s ease;
+        /* 확률 설명 박스 */
+        .prob-box {
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         }
-        .match-item.perfect { border-left-color: #F59E0B; background-color: #FFFBEB; }
-        .match-item.texture { border-left-color: #3B82F6; background-color: #EFF6FF; }
-        .match-item:hover { transform: translateX(5px); }
+        .prob-box::before {
+            content: '💡';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 5px;
+            border-radius: 50%;
+            font-size: 14px;
+            border: 1px solid #e5e7eb;
+        }
     </style>
 </head>
 <body class="bg-texture min-h-screen text-gray-800">
@@ -186,10 +282,10 @@
         <header id="intro-section" class="text-center mb-12 py-8">
             <span class="inline-block py-1 px-3 rounded-full bg-gray-100 text-gray-600 text-xs font-bold mb-4 tracking-wider">COUPLE TEST</span>
             <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-800 leading-tight">
-                우리의 <span class="italic text-gradient">결</span>은<br>어떻게 맞물려 있을까요?
+                우리의 <span class="italic text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-pink-500">결</span>은<br>어떻게 맞물려 있을까요?
             </h1>
             <p class="mt-4 text-gray-600 max-w-xl mx-auto leading-relaxed font-light">
-                점수로 매길 수 없는 두 사람만의 고유한 무늬.<br>
+                24가지 질문으로 알아보는 두 사람만의 고유한 무늬.<br>
                 솔직한 답변을 통해 우리의 '결'이 그리는 그림을 확인해보세요.
             </p>
         </header>
@@ -229,7 +325,7 @@
                             🎲 랜덤 채우기
                         </button>
                         <button id="calculate-btn" class="flex-[2] bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 px-10 rounded-xl shadow-lg transform transition active:scale-95 flex items-center justify-center">
-                            <span>결 확인하기</span>
+                            <span>결과 확인하기</span>
                         </button>
                     </div>
                 </div>
@@ -238,104 +334,112 @@
 
         <div id="results" class="hidden">
             
-            <!-- A. 메인 결과 티켓 -->
-            <div class="max-w-3xl mx-auto fade-in-up">
-                <div class="couple-ticket p-8 md:p-12 rounded-3xl text-center">
-                    <div class="uppercase tracking-widest text-xs text-gray-400 mb-6">결하다 관계 분석 리포트</div>
+            <!-- A. 메인 결과 카드 -->
+            <div class="max-w-lg mx-auto fade-in-up">
+                <div class="result-card-mobile bg-white p-8 text-center relative">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-pink-400"></div>
                     
-                    <h2 id="couple-title" class="text-3xl md:text-5xl font-black serif-font text-gray-800 mb-4 break-keep leading-tight"></h2>
+                    <div class="uppercase tracking-widest text-[10px] text-gray-400 mb-8 font-bold">DESTINY RATE</div>
                     
-                    <!-- 매칭 확률 비주얼 -->
-                    <div class="my-10 max-w-sm mx-auto">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="text-sm font-bold text-gray-500 uppercase tracking-wider">매칭 확률</span>
-                            <span id="match-probability-text" class="text-4xl font-black serif-font text-gray-800">0%</span>
+                    <!-- 비주얼 매칭 애니메이션 (하트 제거 -> 결 연결 파동) -->
+                    <div class="couple-visual-container">
+                        <div class="connection-line-bg"></div>
+                        <div class="connection-wave-container">
+                            <div class="connection-wave"></div>
                         </div>
-                        <div class="prob-bar-bg">
-                            <div id="match-probability-bar" class="prob-bar-fill"></div>
+                        <div class="connection-particles">
+                            <div class="particle" style="left: 10%; animation-delay: 0s; width: 4px; height: 4px;"></div>
+                            <div class="particle" style="left: 50%; animation-delay: 0.5s; width: 6px; height: 6px;"></div>
+                            <div class="particle" style="left: 90%; animation-delay: 1s; width: 4px; height: 4px;"></div>
                         </div>
-                        <p class="text-xs text-gray-400 mt-2 text-right">두 분의 답변 패턴을 기반으로 분석된 수치입니다.</p>
+                        
+                        <div class="avatar-circle avatar-male animate-bounce-subtle">🤵‍♂️</div>
+                        <div class="avatar-circle avatar-female animate-bounce-subtle" style="animation-delay: 0.2s">👰‍♀️</div>
                     </div>
 
-                    <div class="relative z-10 mb-8">
-                        <div class="inline-block border-y-2 border-gray-800 py-3 px-8">
-                            <span id="result-keyword" class="text-xl md:text-2xl font-bold serif-font text-gray-800 tracking-widest"></span>
+                    <!-- 원형 확률 그래프 -->
+                    <div class="score-ring-container mb-4">
+                        <svg class="score-ring-svg" viewBox="0 0 180 180">
+                            <defs>
+                                <linearGradient id="gradientMatch" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#5D7D9A" />
+                                    <stop offset="100%" style="stop-color:#D67D88" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="score-ring-circle-bg" cx="90" cy="90" r="80"></circle>
+                            <circle id="score-ring-circle" class="score-ring-circle-fg" cx="90" cy="90" r="80"></circle>
+                        </svg>
+                        <div class="score-text-centered">
+                            <span class="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-1">Probability</span>
+                            <span id="match-probability-text" class="text-2xl font-black serif-font text-gray-800">0%</span>
                         </div>
-                        <div class="text-xs font-medium text-gray-400 mt-3 uppercase tracking-widest">Relationship Texture Type</div>
                     </div>
 
-                    <div class="ticket-dashed-line"></div>
+                    <!-- 확률 설명 박스 -->
+                    <div class="prob-box mx-auto max-w-xs mb-8">
+                        <p id="prob-desc" class="text-xs text-gray-500 leading-relaxed break-keep"></p>
+                    </div>
+                    
+                    <h2 id="couple-title" class="text-2xl md:text-3xl font-bold serif-font text-gray-800 mb-2 break-keep leading-tight"></h2>
+                    <p id="result-keyword" class="text-sm text-gray-500 font-medium mb-8"></p>
 
-                    <!-- 상세 분석 코멘트 -->
-                    <div class="bg-gray-50 p-8 rounded-2xl text-gray-700 leading-loose break-keep text-left border border-gray-100">
-                        <h4 class="font-bold text-gray-800 mb-4 text-lg serif-font flex items-center border-b border-gray-200 pb-2">
-                            <span class="text-xl mr-2">💬</span> 심층 분석 리포트
-                        </h4>
-                        <div id="result-one-liner" class="space-y-4 text-sm md:text-base font-light"></div>
+                    <!-- 상세 분석 코멘트 박스 -->
+                    <div class="bg-gray-50 p-6 rounded-xl text-gray-700 leading-relaxed break-keep text-left border border-gray-100 shadow-inner">
+                        <div id="result-one-liner" class="space-y-4 text-sm font-light"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- B. 상세 매칭 분석 (NEW) -->
-            <div id="match-detail-section" class="mt-16 max-w-4xl mx-auto fade-in-up delay-100">
-                <div class="text-center mb-10">
+            <!-- B. 상세 매칭 분석 -->
+            <div id="match-detail-section" class="mt-12 max-w-3xl mx-auto fade-in-up delay-100">
+                <div class="text-center mb-8">
                     <span class="text-amber-500 text-xs font-bold tracking-widest uppercase mb-2 block">Matching DNA</span>
-                    <h3 class="text-2xl md:text-3xl font-bold serif-font text-gray-800">우리가 통하는 순간들</h3>
-                    <p class="text-gray-500 text-sm mt-2">두 분의 답변이 어떻게 연결되었는지 확인해보세요.</p>
+                    <h3 class="text-2xl font-bold serif-font text-gray-800">우리가 통하는 순간들</h3>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- 완전 일치 -->
                     <div class="bg-white p-6 rounded-2xl border border-orange-100 shadow-sm">
-                        <h4 class="font-bold text-amber-600 mb-4 flex items-center">
-                            <span class="text-xl mr-2">💎</span> 완전 일치 (Perfect Match)
+                        <h4 class="font-bold text-amber-600 mb-4 flex items-center text-sm md:text-base">
+                            <span class="text-lg mr-2">💎</span> 완전 일치 (Perfect Match)
                         </h4>
-                        <p class="text-xs text-gray-400 mb-4">질문과 답변 선택까지 완벽하게 똑같은 항목입니다.</p>
                         <ul id="perfect-match-list" class="space-y-3 text-sm"></ul>
                     </div>
 
                     <!-- 성향 일치 -->
                     <div class="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm">
-                        <h4 class="font-bold text-blue-600 mb-4 flex items-center">
-                            <span class="text-xl mr-2">🧩</span> 성향 일치 (Texture Match)
+                        <h4 class="font-bold text-blue-600 mb-4 flex items-center text-sm md:text-base">
+                            <span class="text-lg mr-2">🧩</span> 성향 일치 (Texture Match)
                         </h4>
-                        <p class="text-xs text-gray-400 mb-4">답변은 달라도 추구하는 가치관(결)이 같은 항목입니다.</p>
                         <ul id="texture-match-list" class="space-y-3 text-sm"></ul>
                     </div>
                 </div>
             </div>
 
             <!-- C. 상세 프로필 -->
-            <div class="mt-16 fade-in-up delay-200">
-                <div class="text-center mb-10">
-                    <h3 class="text-3xl font-bold serif-font text-gray-800">각자의 '결' 상세 분석</h3>
-                </div>
-                
-                <div class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-gray-100 max-w-5xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-                        <div class="relative h-72 md:h-96 w-full">
+            <div class="mt-12 fade-in-up delay-200">
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 max-w-4xl mx-auto">
+                    <h3 class="text-xl font-bold serif-font text-gray-800 text-center mb-6">각자의 '결' 모양</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="relative h-64 w-full">
                              <canvas id="comparisonRadarChart"></canvas>
                         </div>
-                        <div class="space-y-6">
-                            <div class="p-5 bg-blue-50/50 rounded-2xl border border-blue-100">
-                                <div class="flex items-center mb-3">
-                                    <span class="text-3xl mr-3">🤵‍♂️</span>
-                                    <div>
-                                        <span class="text-xs font-bold text-blue-400 uppercase">남자의 결</span>
-                                        <h4 id="result-group-name-male" class="text-lg font-bold text-blue-900 serif-font"></h4>
-                                    </div>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center">
+                                <span class="text-2xl mr-3">🤵‍♂️</span>
+                                <div>
+                                    <span class="text-xs font-bold text-blue-400 uppercase">남자</span>
+                                    <h4 id="result-group-name-male" class="font-bold text-blue-900 serif-font text-sm md:text-base"></h4>
+                                    <p id="result-group-description-male" class="text-xs text-gray-500 mt-1"></p>
                                 </div>
-                                <p id="result-group-description-male" class="text-sm text-gray-600 leading-relaxed mb-3"></p>
                             </div>
-                            <div class="p-5 bg-pink-50/50 rounded-2xl border border-pink-100">
-                                <div class="flex items-center mb-3">
-                                    <span class="text-3xl mr-3">👰‍♀️</span>
-                                    <div>
-                                        <span class="text-xs font-bold text-pink-400 uppercase">여자의 결</span>
-                                        <h4 id="result-group-name-female" class="text-lg font-bold text-pink-900 serif-font"></h4>
-                                    </div>
+                            <div class="p-4 bg-pink-50/50 rounded-xl border border-pink-100 flex items-center">
+                                <span class="text-2xl mr-3">👰‍♀️</span>
+                                <div>
+                                    <span class="text-xs font-bold text-pink-400 uppercase">여자</span>
+                                    <h4 id="result-group-name-female" class="font-bold text-pink-900 serif-font text-sm md:text-base"></h4>
+                                    <p id="result-group-description-female" class="text-xs text-gray-500 mt-1"></p>
                                 </div>
-                                <p id="result-group-description-female" class="text-sm text-gray-600 leading-relaxed mb-3"></p>
                             </div>
                         </div>
                     </div>
@@ -343,41 +447,36 @@
             </div>
 
             <!-- D. 타로 -->
-            <div class="mt-20 fade-in-up delay-300 bg-gray-900 text-white py-16 px-4 -mx-4 md:rounded-3xl md:mx-auto max-w-6xl relative overflow-hidden">
+            <div class="mt-16 fade-in-up delay-300 bg-gray-900 text-white py-12 px-4 -mx-4 md:rounded-3xl md:mx-auto max-w-5xl relative overflow-hidden">
                 <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]"></div>
-                <div class="relative z-10 max-w-4xl mx-auto">
-                    <div class="text-center mb-12">
+                <div class="relative z-10 max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
                         <span class="text-amber-400 text-xs font-bold tracking-widest uppercase mb-2 block">타로 리딩</span>
-                        <h3 class="text-3xl md:text-4xl font-bold serif-font text-white">두 분의 영적 궁합</h3>
+                        <h3 class="text-2xl md:text-3xl font-bold serif-font text-white">타로가 본 우리의 인연</h3>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center">
-                                <div id="male-tarot-img" class="tarot-card-lg mb-3">
-                                    <div class="tarot-overlay"><div id="male-tarot-name" class="font-bold serif-font text-lg"></div></div>
-                                </div>
-                            </div>
-                            <div class="text-center">
-                                <div id="female-tarot-img" class="tarot-card-lg mb-3">
-                                    <div class="tarot-overlay"><div id="female-tarot-name" class="font-bold serif-font text-lg"></div></div>
-                                </div>
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="text-center">
+                            <div id="male-tarot-img" class="tarot-card-lg mb-2 mx-auto max-w-[150px]">
+                                <div class="tarot-overlay"><div id="male-tarot-name" class="font-bold serif-font text-sm"></div></div>
                             </div>
                         </div>
-                        <div class="space-y-8">
-                            <div>
-                                <h4 class="text-xl font-bold text-amber-200 serif-font mb-3 border-b border-gray-700 pb-2">🔮 카드 해석</h4>
-                                <p id="tarot-compatibility-text" class="text-gray-300 leading-relaxed font-light text-sm md:text-base break-keep"></p>
-                            </div>
-                            <div class="bg-white/10 p-6 rounded-xl border border-white/10">
-                                <h4 class="text-lg font-bold text-white mb-2 serif-font">💡 관계를 위한 조언</h4>
-                                <p id="relationship-advice" class="text-gray-200 text-sm leading-relaxed"></p>
+                        <div class="text-center">
+                            <div id="female-tarot-img" class="tarot-card-lg mb-2 mx-auto max-w-[150px]">
+                                <div class="tarot-overlay"><div id="female-tarot-name" class="font-bold serif-font text-sm"></div></div>
                             </div>
                         </div>
+                    </div>
+                    <div class="space-y-6 bg-white/5 p-6 rounded-xl border border-white/10">
+                         <p id="tarot-compatibility-text" class="text-gray-300 leading-relaxed font-light text-sm break-keep"></p>
+                         <div class="border-t border-white/10 pt-4 mt-4">
+                            <h4 class="text-sm font-bold text-amber-200 mb-2">💡 Advice</h4>
+                            <p id="relationship-advice" class="text-gray-400 text-xs leading-relaxed"></p>
+                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-16 pb-12">
+            <div class="text-center mt-12 pb-12">
                 <button id="retry-btn" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-bold py-4 px-12 rounded-full shadow-sm transition-all transform hover:-translate-y-1">
                     처음부터 다시하기
                 </button>
@@ -387,26 +486,37 @@
     </div>
 
     <script>
-        // --- 1. 데이터 ---
+        /* --- 데이터 (24개 질문 - 문구 수정됨) --- */
         const questions = [
-             { id: 'q1', type: 'similarity', brainType: 'Action (행동)', text: '인스타그램 스토리에 사진을 올린다면?', options: [ { value: '1', text: '아름다운 자연 풍경 (경험중시)', tag: '#경험중시형'}, { value: '2', text: '고급 레스토랑 음식 (성취지향)', tag: '#성취지향형'}, { value: '3', text: '친구들과의 파티 (사교형)', tag: '#사교형'}, { value: '4', text: '잘 올리지 않음 (안정지향)', tag: '#안정지향형'} ] },
-             { id: 'q2', type: 'similarity', brainType: 'Action (행동)', text: '선호하는 운동 스타일은?', options: [ { value: '1', text: '혼자 집중하는 운동 (러닝, 헬스)', tag: '#자기계발형'}, { value: '2', text: '팀이나 파트너와 함께 (테니스)', tag: '#활동적인'}, { value: '3', text: '운동은 별로 즐기지 않음', tag: '#정적인'} ] },
-             { id: 'q22', type: 'similarity', brainType: 'Action (행동)', text: '이상적인 주말의 모습은?', options: [ { value: '1', text: '집에서 편안한 휴식 (집돌이/집순이)', tag: '#집순이/집돌이'}, { value: '2', text: '취미 활동이나 배움', tag: '#자기계발형'}, { value: '3', text: '친구들과의 모임', tag: '#사교형'}, { value: '4', text: '가까운 곳으로 여행', tag: '#모험추구형'} ] },
-             { id: 'q4', type: 'crossover', brainType: 'Emotion (감정)', text_me: '꿈꾸는 프러포즈는?', text_partner: '파트너에게 해주고 싶은 프러포즈는?', options: [ { value: '1', text: '분위기 좋은 곳에서 로맨틱하게', tag: '#낭만주의형'}, { value: '2', text: '많은 사람 앞에서의 이벤트', tag: '#이벤트선호'}, { value: '3', text: '추억이 담긴 곳에서 진솔하게', tag: '#관계중심형'}, { value: '4', text: '화려함보다 진심 담긴 편지와 반지', tag: '#실용주의형'} ] },
-             { id: 'q5', type: 'crossover', brainType: 'Emotion (감정)', text_me: '가장 설레는 연인의 행동은?', text_partner: '연인을 위해 해주고 싶은 행동은?', options: [ { value: '1', text: '사소한 말을 기억해줄 때', tag: '#세심함중시'}, { value: '2', text: '말없이 꼭 안아줄 때', tag: '#스킨십중시'}, { value: '3', text: '나의 일을 응원해줄 때', tag: '#정서적지지'}, { value: '4', text: '나에게 온전히 집중해줄 때', tag: '#시간공유형'} ] },
-             { id: 'q23', type: 'similarity', brainType: 'Emotion (감정)', text: '공공장소에서의 스킨십은?', options: [ { value: '1', text: '손 잡는 정도만 (보수적)', tag: '#보수적가치관'}, { value: '2', text: '주변 피해 안 주면 자유롭게', tag: '#자유로운표현'}, { value: '3', text: '둘만의 공간에서만', tag: '#사생활중시'}, { value: '4', text: '분위기에 따라 다름', tag: '#상황적응형'} ] },
-             { id: 'q26', type: 'similarity', brainType: 'Emotion (감정)', text: '비 오는 날, 연인이 회사 앞으로 데리러 왔다면?', options: [ { value: '1', text: '어떻게 왔어! 너무 고마워 (감동)', tag: '#감정표현형'}, { value: '2', text: '고생스럽게 왜 왔어~ (걱정)', tag: '#배려형'}, { value: '3', text: '마침 보고 싶었는데 잘됐다!', tag: '#낭만주의형'}, { value: '4', text: '잘 왔다, 맛있는 거 먹으러 가자!', tag: '#실용주의형'} ] },
-             { id: 'q17', type: 'similarity', brainType: 'Emotion (감정)', text: '깻잎 논쟁 (내 친구의 깻잎을 연인이 떼어줌)', options: [ { value: '1', text: '상관없음, 매너임', tag: '#쿨한연애'}, { value: '2', text: '기분 나쁘지만 티 안 냄', tag: '#감정조절형'}, { value: '3', text: '질투남, 장난스럽게 표현', tag: '#관계중심형'}, { value: '4', text: '절대 안 됨, 정색', tag: '#원칙주의형'} ] },
-             { id: 'q18', type: 'similarity', brainType: 'Emotion (감정)', text: '선호하는 반려동물 스타일', options: [ { value: '1', text: '활동적인 강아지', tag: '#활동적인'}, { value: '2', text: '조용한 고양이', tag: '#차분한'}, { value: '3', text: '좋지만 키울 자신 없음', tag: '#현실주의형'}, { value: '4', text: '키우는 것 선호 안 함', tag: '#개인주의형'} ] },
-             { id: 'q11', type: 'similarity', brainType: 'Thinking (가치관)', text: '친구가 추천한 확실한 주식 정보, 투자는?', options: [ { value: '1', text: '믿고 영끌 투자', tag: '#과감한투자'}, { value: '2', text: '현금 자산 전부 투자', tag: '#공격적투자'}, { value: '3', text: '여유 자금의 절반만', tag: '#안정적투자'}, { value: '4', text: '분석 없이 투자 안 함', tag: '#원칙주의형'} ] },
-             { id: 'q19', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '갈등 발생 시 나의 해결 스타일', text_partner: '파트너가 해줬으면 하는 해결 방식', options: [ { value: '1', text: '시간을 갖고 차분히 대화', tag: '#논리적대화'}, { value: '2', text: '빨리 사과하고 덮기', tag: '#갈등회피형'}, { value: '3', text: '감정을 다 털어놓기', tag: '#감정표정형'}, { value: '4', text: '함께 원인 분석하기', tag: '#문제해결형'} ] },
-             { id: 'q27', type: 'dynamic', brainType: 'Thinking (가치관)', text: '청소 후 구석에 먼지가 남았다면?', options: [ { value: '1', text: '해준 게 어디야, 고마워함', tag: '#긍정적강화', followup: { text: '반복된다면?', options: [{ value: '1', text: '말 안 해도 고쳐주길' }, { value: '2', text: '직접 말함' }, { value: '3', text: '내가 함' }] } }, { value: '2', text: '다음엔 여기도 부탁해 (피드백)', tag: '#피드백제공', followup: { text: '그래도 안 고쳐지면?', options: [{ value: '1', text: '진지하게 대화' }, { value: '2', text: '포기하고 내가 함' }, { value: '3', text: '잔소리함' }] } }, { value: '3', text: '말없이 내가 치움', tag: '#갈등회피형', followup: { text: '불만이 쌓인다면?', options: [{ value: '1', text: '알아서 눈치채길' }, { value: '2', text: '폭발함' }, { value: '3', text: '그냥 참음' }] } }, { value: '4', text: '그 정도는 신경 안 씀', tag: '#YOLO', followup: { text: '상대가 깔끔하다면?', options: [{ value: '1', text: '맞춰주려 노력' }, { value: '2', text: '상대가 이해해야 함' }, { value: '3', text: '업체 부름' }] } } ] },
-             { id: 'q24', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '적절한 본가 방문 빈도는?', text_partner: '파트너가 원했으면 하는 빈도는?', options: [ { value: '1', text: '특별한 날에만', tag: '#독립성중시'}, { value: '2', text: '한두 달에 한 번', tag: '#가족중심형'}, { value: '3', text: '원할 때 자유롭게', tag: '#자유추구형'}, { value: '4', text: '자주 왕래하며 가깝게', tag: '#관계중심형'} ] },
-             { id: 'q25', type: 'dynamic', brainType: 'Thinking (가치관)', text: '가사 분담에 대한 생각은?', options: [ { value: '1', text: '철저한 역할 분담', tag: '#효율중시형', followup: { text: '안 지켜진다면?', options: [{ value: '1', text: '재협상' }, { value: '2', text: '내가 함' }, { value: '3', text: '그냥 둠' }]}}, { value: '2', text: '시간 되는 사람이', tag: '#자율형', followup: { text: '나만 한다면?', options: [{ value: '1', text: '불만 표출' }, { value: '2', text: '눈치 줌' }, { value: '3', text: '내가 더 잘하니까 함' }]}}, { value: '3', text: '주말에 몰아서 같이', tag: '#계획형', followup: { text: '주말 약속이 생기면?', options: [{ value: '1', text: '청소가 우선' }, { value: '2', text: '약속 존중' }, { value: '3', text: '평일에 나눠서' }]}}, { value: '4', text: '기계와 도우미 활용', tag: '#편리성추구', followup: { text: '비용이 부담되면?', options: [{ value: '1', text: '편리함이 우선' }, { value: '2', text: '줄임' }, { value: '3', text: '우리가 함' }]}} ] },
-             { id: 'q12', type: 'similarity', brainType: 'Thinking (가치관)', text: '이상적인 자녀 계획', options: [ { value: '1', text: '딩크족 (없음)', tag: '#개인주의형'}, { value: '2', text: '한 명에게 집중', tag: '#계획형'}, { value: '3', text: '두 명 이상', tag: '#가정중심형'}, { value: '4', text: '다둥이 가족', tag: '#다자녀선호'} ] },
-             { id: 'q13', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '선호하는 경제 활동 형태', text_partner: '파트너가 원했으면 하는 형태', options: [ { value: '1', text: '맞벌이 (커리어 중시)', tag: '#성장지향형'}, { value: '2', text: '상황에 따라 유연하게', tag: '#상황적응형'}, { value: '3', text: '외벌이 (가사 전담)', tag: '#전통적가치관'}, { value: '4', text: '경제적 자유 (파이어족)', tag: '#자유추구형'} ] },
-             { id: 'q15', type: 'similarity', brainType: 'Thinking (가치관)', text: '결혼을 원하는 가장 큰 이유', options: [ { value: '1', text: '정서적 안정감', tag: '#안정지향형'}, { value: '2', text: '사랑의 결실/가정', tag: '#가정중심형'}, { value: '3', text: '함께 성장하는 파트너', tag: '#성장지향형'}, { value: '4', text: '즐거운 인생 동반자', tag: '#모험추구형'} ] },
-             { id: 'q16', type: 'dynamic', brainType: 'Thinking (가치관)', text: '신혼집 선택의 최우선 조건', options: [ { value: '1', text: '서울 중심지 (미래가치)', tag: '#미래가치중시', followup: { text: '집이 좁다면?', options: [{ value: '1', text: '참음' }, { value: '2', text: '고민' }, { value: '3', text: '싫음' }]}}, { value: '2', text: '신도시 신축 (쾌적함)', tag: '#현재안정중시', followup: { text: '출퇴근이 멀다면?', options: [{ value: '1', text: '감수' }, { value: '2', text: '힘듦' }, { value: '3', text: '절대 안 됨' }]}}, { value: '3', text: '직주근접 (편리함)', tag: '#실용주의형', followup: { text: '집이 낡았다면?', options: [{ value: '1', text: '리모델링하면 됨' }, { value: '2', text: '고민' }, { value: '3', text: '싫음' }]}}, { value: '4', text: '취향 담긴 인테리어', tag: '#심미주의형', followup: { text: '예산 초과라면?', options: [{ value: '1', text: '무리해서라도' }, { value: '2', text: '타협' }, { value: '3', text: '포기' }]}} ] }
+            // 1. ACTION (7개)
+            { id: 'q1', type: 'similarity', brainType: 'Action (행동)', text: 'SNS에 사진을 올린다면, 주로 어떤 피드를 채우고 싶으신가요?', options: [ { value: '1', text: '아름다운 자연 풍경', tag: '#경험중시형'}, { value: '2', text: '고급스러운 장소나 맛있는 음식', tag: '#성취지향형'}, { value: '3', text: '친구들과 함께 즐기는 파티', tag: '#사교형'}, { value: '4', text: '거의 눈팅만 하거나 비공개', tag: '#안정지향형'} ] },
+            { id: 'q2', type: 'similarity', brainType: 'Action (행동)', text: '건강을 위해 운동을 한다면, 어떤 스타일이 나에게 맞나요?', options: [ { value: '1', text: '혼자 집중하는 헬스나 러닝', tag: '#자기계발형'}, { value: '2', text: '함께 호흡하는 테니스나 팀스포츠', tag: '#활동적인'}, { value: '3', text: '격한 운동보다는 산책이나 숨쉬기', tag: '#정적인'} ] },
+            { id: 'q22', type: 'similarity', brainType: 'Action (행동)', text: '나에게 가장 이상적인 주말의 풍경은 무엇인가요?', options: [ { value: '1', text: '집콕하며 조용히 에너지 충전', tag: '#집순이/집돌이'}, { value: '2', text: '새로운 배움이나 취미 활동 몰입', tag: '#자기계발형'}, { value: '3', text: '친구들과 왁자지껄한 모임', tag: '#사교형'}, { value: '4', text: '가까운 곳이라도 훌쩍 떠나는 여행', tag: '#모험추구형'} ] },
+            { id: 'q28', type: 'similarity', brainType: 'Action (행동)', text: '여행 계획을 짤 때, 나는 어떤 스타일에 가깝나요?', options: [ { value: '1', text: '동선과 시간까지 분 단위로 꼼꼼하게', tag: '#계획형'}, { value: '2', text: '큰 틀만 잡고 그때그때 자유롭게', tag: '#자유추구형'}, { value: '3', text: '유명한 맛집 위주로 탐방', tag: '#경험중시형'}, { value: '4', text: '계획 없이 호캉스에서 푹 쉬기', tag: '#안정지향형'} ] },
+            { id: 'q29', type: 'similarity', brainType: 'Action (행동)', text: '선호하는 데이트 장소는 어디인가요?', options: [ { value: '1', text: '요즘 뜨는 새로 생긴 핫플레이스', tag: '#경험중시형'}, { value: '2', text: '조용하고 아늑한 우리만의 단골집', tag: '#안정지향형'}, { value: '3', text: '활동적인 테마파크나 전시회', tag: '#활동적인'}, { value: '4', text: '편안한 집에서 넷플릭스 보기', tag: '#집순이/집돌이'} ] },
+            { id: 'q30', type: 'similarity', brainType: 'Action (행동)', text: '나의 평소 아침 기상 스타일은?', options: [ { value: '1', text: '알람이 울리면 한 번에 벌떡 (아침형)', tag: '#계획형'}, { value: '2', text: '5분만 더... 하다가 겨우 기상 (올빼미형)', tag: '#자유추구형'}, { value: '3', text: '일어나자마자 뉴스나 할 일 체크', tag: '#성취지향형'}, { value: '4', text: '여유롭게 침대에서 뒹굴거리기', tag: '#안정지향형'} ] },
+            { id: 'q31', type: 'similarity', brainType: 'Action (행동)', text: '쇼핑을 할 때 나는 주로 어떻게 행동하나요?', options: [ { value: '1', text: '필요한 목록만 적어서 딱 그것만 산다', tag: '#실용주의형'}, { value: '2', text: '최저가와 성능을 비교 분석 후 구매', tag: '#효율중시형'}, { value: '3', text: '내 눈에 예쁘면 일단 사고 본다', tag: '#심미주의형'}, { value: '4', text: '세일할 때 생필품을 미리 쟁여둔다', tag: '#현실주의형'} ] },
+
+            // 2. EMOTION (8개)
+            { id: 'q4', type: 'crossover', brainType: 'Emotion (감정)', text_me: '내가 꿈꾸는 이상적인 프러포즈는?', text_partner: '파트너에게 해주고 싶은 프러포즈는?', options: [ { value: '1', text: '로맨틱한 분위기 속에서 무드있게', tag: '#낭만주의형'}, { value: '2', text: '많은 사람들 앞에서 화려한 이벤트로', tag: '#이벤트선호'}, { value: '3', text: '추억이 깃든 장소에서 진솔한 대화로', tag: '#관계중심형'}, { value: '4', text: '화려함보다 담백하게 편지와 반지로', tag: '#실용주의형'} ] },
+            { id: 'q5', type: 'crossover', brainType: 'Emotion (감정)', text_me: '나를 가장 설레게 하는 연인의 행동은?', text_partner: '내가 연인에게 해주고 싶은 행동은?', options: [ { value: '1', text: '지나가듯 한 사소한 말을 기억해주기', tag: '#세심함중시'}, { value: '2', text: '힘든 날 말없이 따뜻하게 안아주기', tag: '#스킨십중시'}, { value: '3', text: '나의 꿈과 목표를 진심으로 응원해주기', tag: '#정서적지지'}, { value: '4', text: '만날 때 스마트폰 없이 오롯이 집중해주기', tag: '#시간공유형'} ] },
+            { id: 'q23', type: 'similarity', brainType: 'Emotion (감정)', text: '공공장소에서의 스킨십, 어디까지 괜찮나요?', options: [ { value: '1', text: '손 잡기 정도만 괜찮다', tag: '#보수적가치관'}, { value: '2', text: '가벼운 포옹이나 뽀뽀까지는 OK', tag: '#자유로운표현'}, { value: '3', text: '남들 시선 없는 둘만의 공간이 좋다', tag: '#사생활중시'}, { value: '4', text: '분위기와 장소에 따라 그때그때 다르다', tag: '#상황적응형'} ] },
+            { id: 'q26', type: 'similarity', brainType: 'Emotion (감정)', text: '비 오는 날, 연인이 회사 앞으로 데리러 온다면?', options: [ { value: '1', text: '완전 감동이야! 고마움을 격하게 표현한다', tag: '#감정표현형'}, { value: '2', text: '비 오는데 힘들게 왜 왔어~ (걱정부터 함)', tag: '#배려형'}, { value: '3', text: '마침 보고 싶었는데 잘됐다! (낭만적)', tag: '#낭만주의형'}, { value: '4', text: '잘 왔다, 얼른 맛있는 거 먹으러 가자', tag: '#실용주의형'} ] },
+            { id: 'q17', type: 'similarity', brainType: 'Emotion (감정)', text: '내 연인이 내 친구의 깻잎을 떼어준다면?', options: [ { value: '1', text: '그냥 매너니까, 별 생각 없다', tag: '#쿨한연애'}, { value: '2', text: '기분은 좀 그렇지만 겉으로 티 내지 않는다', tag: '#감정조절형'}, { value: '3', text: '질투나니까 다음부터는 떼주지 마 (표현)', tag: '#관계중심형'}, { value: '4', text: '절대 안 된다, 그 자리에서 정색할 수도', tag: '#원칙주의형'} ] },
+            { id: 'q18', type: 'similarity', brainType: 'Emotion (감정)', text: '함께 키우고 싶은 반려동물 스타일은?', options: [ { value: '1', text: '활동적이고 애교 많은 강아지', tag: '#활동적인'}, { value: '2', text: '조용하고 독립적인 고양이', tag: '#차분한'}, { value: '3', text: '보는 것만 좋아하고 키울 자신은 없다', tag: '#현실주의형'}, { value: '4', text: '반려동물을 키울 생각은 없다', tag: '#개인주의형'} ] },
+            { id: 'q32', type: 'similarity', brainType: 'Emotion (감정)', text: '연인 사이의 연락 빈도, 어느 정도가 좋은가요?', options: [ { value: '1', text: '일거수일투족을 실시간으로 공유', tag: '#관계중심형'}, { value: '2', text: '용건이 있을 때만 해도 괜찮다', tag: '#실용주의형'}, { value: '3', text: '하루 일과 끝나고 자기 전 통화면 충분', tag: '#독립성중시'}, { value: '4', text: '특별한 일 없어도 틈나는 대로 자주', tag: '#세심함중시'} ] },
+            { id: 'q33', type: 'similarity', brainType: 'Emotion (감정)', text: '나의 질투심 강도는 어느 정도인가요?', options: [ { value: '1', text: '상대를 믿으니까 거의 없는 편이다', tag: '#쿨한연애'}, { value: '2', text: '질투는 나지만 속으로만 삭힌다', tag: '#감정조절형'}, { value: '3', text: '귀엽게 투정 부리며 표현한다', tag: '#감정표현형'}, { value: '4', text: '이성 문제에 대해서는 매우 예민하다', tag: '#원칙주의형'} ] },
+
+            // 3. THINKING (9개)
+            { id: 'q11', type: 'similarity', brainType: 'Thinking (가치관)', text: '친구가 확실한 투자 정보를 줬다면 어떻게 할까요?', options: [ { value: '1', text: '인생은 한방! 대출까지 받아서 투자', tag: '#과감한투자'}, { value: '2', text: '가진 현금 자산을 전부 투자', tag: '#공격적투자'}, { value: '3', text: '안전하게 여유 자금의 일부만', tag: '#안정적투자'}, { value: '4', text: '내가 직접 공부하고 확신하기 전까진 안 함', tag: '#원칙주의형'} ] },
+            { id: 'q19', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '갈등이 생겼을 때 나의 해결 방식은?', text_partner: '파트너가 해줬으면 하는 해결 방식은?', options: [ { value: '1', text: '시간을 두고 감정을 가라앉힌 뒤 차분히', tag: '#논리적대화'}, { value: '2', text: '싸움이 길어지는 게 싫어 빠르게 사과', tag: '#갈등회피형'}, { value: '3', text: '쌓인 감정을 솔직하게 다 토로하기', tag: '#감정표현형'}, { value: '4', text: '누구 잘못인지 원인부터 논리적으로 분석', tag: '#문제해결형'} ] },
+            { id: 'q27', type: 'dynamic', brainType: 'Thinking (가치관)', text: '파트너가 청소를 했는데 구석에 먼지가 남았다면?', options: [ { value: '1', text: '해준 게 어디야, 고마워하며 넘어간다', tag: '#긍정적강화', followup: { text: '계속 반복된다면?', options: [{ value: '1', text: '알아서 고쳐주길 바란다' }, { value: '2', text: '좋게 말해서 고친다' }, { value: '3', text: '그냥 내가 한다' }] } }, { value: '2', text: '다음엔 여기도 닦아달라고 피드백한다', tag: '#피드백제공', followup: { text: '그래도 안 고쳐지면?', options: [{ value: '1', text: '진지하게 대화한다' }, { value: '2', text: '포기하고 내가 한다' }, { value: '3', text: '계속 잔소리한다' }] } }, { value: '3', text: '말없이 내가 조용히 치운다', tag: '#갈등회피형', followup: { text: '불만이 쌓인다면?', options: [{ value: '1', text: '눈치를 준다' }, { value: '2', text: '한번에 폭발한다' }, { value: '3', text: '해탈한다' }] } }, { value: '4', text: '먼지 좀 있으면 어때, 신경 안 쓴다', tag: '#YOLO', followup: { text: '상대가 싫어하면?', options: [{ value: '1', text: '맞춰주려 노력한다' }, { value: '2', text: '상대가 이해해주길 바란다' }, { value: '3', text: '도우미를 부른다' }] } } ] },
+            { id: 'q24', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '결혼 후 적절한 본가 방문 빈도는?', text_partner: '파트너가 원했으면 하는 방문 빈도는?', options: [ { value: '1', text: '명절이나 생신 등 특별한 날에만', tag: '#독립성중시'}, { value: '2', text: '한두 달에 한 번 정도 정기적으로', tag: '#가족중심형'}, { value: '3', text: '정해두지 않고 필요할 때 자유롭게', tag: '#자유추구형'}, { value: '4', text: '가까이 살면서 자주 왕래하며 가깝게', tag: '#관계중심형'} ] },
+            { id: 'q25', type: 'dynamic', brainType: 'Thinking (가치관)', text: '가사 분담에 대한 솔직한 생각은?', options: [ { value: '1', text: '각자 잘하는 걸 정해 칼같이 나눈다', tag: '#효율중시형', followup: { text: '규칙이 안 지켜지면?', options: [{ value: '1', text: '재협상한다' }, { value: '2', text: '답답해서 내가 한다' }, { value: '3', text: '그냥 둔다' }]}}, { value: '2', text: '그때그때 시간 되는 사람이 한다', tag: '#자율형', followup: { text: '나만 독박 쓴다면?', options: [{ value: '1', text: '화낸다' }, { value: '2', text: '눈치 준다' }, { value: '3', text: '내가 더 잘하니까 한다' }]}}, { value: '3', text: '주말에 날 잡고 함께 몰아서 한다', tag: '#계획형', followup: { text: '주말 약속이 생기면?', options: [{ value: '1', text: '청소가 우선이다' }, { value: '2', text: '약속을 존중한다' }, { value: '3', text: '평일에 나눠서 한다' }]}}, { value: '4', text: '편리한 가전이나 도우미를 쓴다', tag: '#편리성추구', followup: { text: '비용이 부담되면?', options: [{ value: '1', text: '그래도 편리함이 우선' }, { value: '2', text: '비용을 줄인다' }, { value: '3', text: '직접 몸으로 한다' }]}} ] },
+            { id: 'q12', type: 'similarity', brainType: 'Thinking (가치관)', text: '이상적인 자녀 계획은 어떻게 되나요?', options: [ { value: '1', text: '딩크족 (자녀 없이 둘만)', tag: '#개인주의형'}, { value: '2', text: '한 명에게 집중해서 잘 키우기', tag: '#계획형'}, { value: '3', text: '두 명 이상, 형제자매가 있는 게 좋다', tag: '#가정중심형'}, { value: '4', text: '다둥이 가족으로 북적북적하게', tag: '#다자녀선호'} ] },
+            { id: 'q13', type: 'crossover', brainType: 'Thinking (가치관)', text_me: '선호하는 경제 활동 형태는?', text_partner: '파트너에게 바라는 경제 활동은?', options: [ { value: '1', text: '각자 커리어를 위한 맞벌이', tag: '#성장지향형'}, { value: '2', text: '상황에 따라 유연하게 조정', tag: '#상황적응형'}, { value: '3', text: '한 명은 경제활동, 한 명은 가사 전담', tag: '#전통적가치관'}, { value: '4', text: '빠른 은퇴 후 경제적 자유 (파이어족)', tag: '#자유추구형'} ] },
+            { id: 'q15', type: 'similarity', brainType: 'Thinking (가치관)', text: '나에게 결혼의 가장 큰 의미는?', options: [ { value: '1', text: '내 편이 생기는 정서적 안정감', tag: '#안정지향형'}, { value: '2', text: '사랑의 결실이자 가정의 완성', tag: '#가정중심형'}, { value: '3', text: '서로 더 나은 사람이 되는 성장', tag: '#성장지향형'}, { value: '4', text: '평생 함께 놀 즐거운 인생 친구', tag: '#모험추구형'} ] },
+            { id: 'q16', type: 'dynamic', brainType: 'Thinking (가치관)', text: '신혼집 선택 시 최우선 조건은?', options: [ { value: '1', text: '미래 가치가 높은 서울/중심지', tag: '#미래가치중시', followup: { text: '집이 너무 좁다면?', options: [{ value: '1', text: '미래를 위해 참는다' }, { value: '2', text: '고민된다' }, { value: '3', text: '좁은 건 싫다' }]}}, { value: '2', text: '쾌적하고 넓은 신도시 신축', tag: '#현재안정중시', followup: { text: '출퇴근이 너무 멀면?', options: [{ value: '1', text: '감수한다' }, { value: '2', text: '너무 힘들 것 같다' }, { value: '3', text: '이사 고려한다' }]}}, { value: '3', text: '회사가 가까운 직주근접', tag: '#실용주의형', followup: { text: '집이 너무 낡았다면?', options: [{ value: '1', text: '수리해서 산다' }, { value: '2', text: '고민된다' }, { value: '3', text: '낡은 집은 싫다' }]}}, { value: '4', text: '내 취향이 담긴 예쁜 인테리어', tag: '#심미주의형', followup: { text: '예산이 초과된다면?', options: [{ value: '1', text: '무리해서라도 한다' }, { value: '2', text: '적당히 타협한다' }, { value: '3', text: '포기한다' }]}} ] }
         ];
 
         const tagGroups = {
@@ -541,125 +651,13 @@
             femaleContainer.innerHTML = femaleHTML;
         }
 
-        document.getElementById('random-btn').addEventListener('click', () => {
-            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-            const groups = {}; 
-            document.querySelectorAll('input[type="radio"]').forEach(r => {
-                if(!groups[r.name]) groups[r.name] = [];
-                groups[r.name].push(r);
-            });
-            Object.values(groups).forEach(options => {
-                const random = options[Math.floor(Math.random() * options.length)];
-                random.checked = true;
-                if(random.getAttribute('onchange')) random.dispatchEvent(new Event('change'));
-            });
-            setTimeout(() => {
-                const dynGroups = {};
-                document.querySelectorAll('.dynamic-area input[type="radio"]').forEach(r => {
-                     if(!dynGroups[r.name]) dynGroups[r.name] = [];
-                     dynGroups[r.name].push(r);
-                });
-                Object.values(dynGroups).forEach(options => {
-                    const random = options[Math.floor(Math.random() * options.length)];
-                    random.checked = true;
-                });
-            }, 100);
-        });
-
-        // --- 결과 계산 ---
-        document.getElementById('calculate-btn').addEventListener('click', () => {
-            const scores = { sim: 0, pref: 0, shape: 0 };
-            // 매칭 상세 정보를 담을 객체
-            const details = { exactMatches: [], textureMatches: [] };
-            const maleCounts = {}, femaleCounts = {};
-            
-            questions.forEach(q => {
-                const m = document.querySelector(`input[name="${q.id}-me-male"]:checked`);
-                const f = document.querySelector(`input[name="${q.id}-me-female"]:checked`);
-                
-                if(m && f) {
-                    const mGroup = getGroup(m.dataset.tag);
-                    const fGroup = getGroup(f.dataset.tag);
-                    if(mGroup) maleCounts[mGroup] = (maleCounts[mGroup]||0)+1;
-                    if(fGroup) femaleCounts[fGroup] = (femaleCounts[fGroup]||0)+1;
-                    
-                    // Similarity & Detailed Match Logic
-                    if(q.type === 'similarity') {
-                        if(m.value === f.value) { 
-                            scores.sim += 4; 
-                            details.exactMatches.push({
-                                question: q.text,
-                                answer: m.dataset.text.split('(')[0].trim(), // 텍스트 정리
-                                type: 'Action' // 임시
-                            });
-                        } 
-                        else if(mGroup === fGroup) { 
-                            scores.sim += 3; 
-                            details.textureMatches.push({
-                                question: q.text,
-                                maleAnswer: m.dataset.text.split('(')[0].trim(),
-                                femaleAnswer: f.dataset.text.split('(')[0].trim()
-                            });
-                        }
-                    }
-                    
-                    // Preference Logic
-                    if(q.type === 'crossover') {
-                        const mp = document.querySelector(`input[name="${q.id}-partner-male"]:checked`);
-                        const fp = document.querySelector(`input[name="${q.id}-partner-female"]:checked`);
-                        let prefScore = 0;
-                        let pMatch = false;
-                        if(mp && mp.value === f.value) { prefScore += 8; pMatch = true; }
-                        if(fp && fp.value === m.value) { prefScore += 8; pMatch = true; }
-                        scores.pref += prefScore;
-                        
-                        // 크로스오버 완전 일치 (내가 원하는 걸 상대가 가지고 있을 때)
-                        if(mp && mp.value === f.value && fp && fp.value === m.value) {
-                             details.exactMatches.push({
-                                question: q.text_me,
-                                answer: `서로가 원하는 '${m.dataset.text.split('(')[0].trim()}' & '${f.dataset.text.split('(')[0].trim()}' 성향 보유`,
-                                type: 'Emotion'
-                            });
-                        }
-                    }
-                    if(q.type === 'dynamic') {
-                        const mf = document.querySelector(`input[name="${q.id}-followup-male"]:checked`);
-                        const ff = document.querySelector(`input[name="${q.id}-followup-female"]:checked`);
-                        let dScore = 0;
-                        if(mf && mf.value === f.value) dScore += parseInt(mf.dataset.score||4);
-                        if(ff && ff.value === m.value) dScore += parseInt(ff.dataset.score||4);
-                        scores.pref += dScore;
-                    }
-                }
-            });
-
-            const finalSim = Math.min(100, (scores.sim / 40) * 100); 
-            const finalPref = Math.min(100, (scores.pref / 80) * 100); 
-            
-            let diffSq = 0;
-            const groups = Object.keys(sensoryProfiles);
-            groups.forEach(g => {
-                const mVal = (maleCounts[g]||0), fVal = (femaleCounts[g]||0);
-                diffSq += Math.pow(mVal - fVal, 2);
-            });
-            const finalShape = Math.max(0, 100 - (Math.sqrt(diffSq) * 10)); 
-            const totalScore = (finalShape * 0.7) + (finalSim * 0.15) + (finalPref * 0.15);
-            
-            showResults({
-                total: Math.round(totalScore),
-                maleCounts, femaleCounts,
-                details // 매칭 상세 정보 전달
-            });
-        });
-
         function getGroup(tag) {
             for(const [key, val] of Object.entries(tagGroups)) {
                 if(val.tags.includes(tag)) return key;
             }
             return null;
         }
-        
-        // 상세 분석 텍스트 생성 함수
+
         function generateAnalysisText(score, mDom, fDom) {
             let title = "", text = "";
             
@@ -693,7 +691,6 @@
                 `;
             }
             
-            // 결 보완 설명 추가
             let complementText = "";
             if(mDom === fDom) {
                 complementText = `<br><p class="mt-4 border-t pt-4"><b>🤝 서로를 채워주는 결:</b> 두 분 모두 <b>'${sensoryProfiles[mDom].name}'</b>을 공유하고 있어 갈등 상황에서 해결 방식이 매우 비슷합니다. 이는 큰 장점이지만, 둘 다 감정적일 때 브레이크를 걸어줄 사람이 없을 수 있습니다. 한 분이 감정적일 때 다른 분이 이성적인 역할을 의식적으로 맡아주세요.</p>`;
@@ -714,25 +711,41 @@
             const mDom = getDominant(data.maleCounts);
             const fDom = getDominant(data.femaleCounts);
 
-            // 1. 분석 텍스트 생성 (상세)
             const analysis = generateAnalysisText(data.total, mDom, fDom);
 
             document.getElementById('result-keyword').innerText = analysis.title;
             document.getElementById('couple-title').innerText = analysis.title;
             document.getElementById('result-one-liner').innerHTML = analysis.text;
 
-            // 2. 매칭 확률 바 업데이트
-            const probBar = document.getElementById('match-probability-bar');
-            const probText = document.getElementById('match-probability-text');
-            // 애니메이션 효과
+            // 확률 설명 텍스트
+            const probDesc = document.getElementById('prob-desc');
+            if (data.exactMatchCount === 0) {
+                probDesc.innerHTML = "0개의 답변이 일치했습니다. 오히려 0개를 맞추기도 힘들다는 사실, 아시나요? <b>우리는 서로의 새로운 세상을 열어줄 운명입니다.</b>";
+            } else if (data.exactMatchCount <= 5) {
+                probDesc.innerHTML = `24개 질문 중 <b>${data.exactMatchCount}개</b>가 똑같이 일치했습니다.<br>이 확률은 누군가를 우연히 길에서 두 번 마주칠 확률과 같습니다.`;
+            } else if (data.exactMatchCount <= 10) {
+                 probDesc.innerHTML = `24개 질문 중 <b>${data.exactMatchCount}개</b>나 일치했습니다!<br>이 정도면 전생에 형제나 남매였을지도 모르는 <b>놀라운 인연</b>입니다.`;
+            } else {
+                 probDesc.innerHTML = `세상에! 24개 중 <b>${data.exactMatchCount}개</b>가 일치합니다.<br>로또 당첨보다 훨씬 어려운 확률을 뚫고 만난, <b>기적 같은 천생연분</b>입니다.`;
+            }
+
+            const scoreCircle = document.getElementById('score-ring-circle');
+            const matchText = document.getElementById('match-probability-text');
+            
+            let rarityScore = 0;
+            if (data.exactMatchCount > 0) {
+                // 12개만 맞아도 시각적으로 꽉 차 보이게 (기적적인 확률이므로)
+                rarityScore = (data.exactMatchCount / 12) * 100;
+                rarityScore = Math.min(100, rarityScore); 
+            }
+
+            const circumference = 502;
+            const offset = circumference - (rarityScore / 100) * circumference;
+            
             setTimeout(() => {
-                probBar.style.width = `${data.total}%`;
-                let current = 0;
-                const interval = setInterval(() => {
-                    current += 1;
-                    probText.innerText = `${current}%`;
-                    if(current >= data.total) clearInterval(interval);
-                }, 15); // 속도 조절
+                scoreCircle.style.strokeDashoffset = offset;
+                matchText.innerText = data.probabilityText; 
+                matchText.classList.add('text-xl'); 
             }, 300);
 
             document.getElementById('result-group-name-male').innerText = sensoryProfiles[mDom].name;
@@ -741,32 +754,31 @@
             document.getElementById('result-group-description-female').innerText = sensoryProfiles[fDom].description;
 
             drawRadar(data.maleCounts, data.femaleCounts);
-
-            // 3. 상세 매칭 리스트 렌더링
+            
             const renderMatchList = (list, containerId, type) => {
                 const container = document.getElementById(containerId);
                 container.innerHTML = '';
                 if(list.length === 0) {
-                    container.innerHTML = '<li class="text-gray-400 italic">해당하는 항목이 없습니다.</li>';
+                    container.innerHTML = '<li class="text-gray-400 italic text-xs">해당하는 항목이 없습니다.</li>';
                     return;
                 }
                 list.forEach(item => {
                     const li = document.createElement('li');
-                    li.className = `match-item ${type} p-3 rounded-lg mb-2`;
+                    li.className = `match-item ${type} p-3 rounded-lg mb-2 border-l-4 border-l-${type === 'perfect' ? 'amber' : 'blue'}-400 bg-gray-50`;
                     
                     if(type === 'perfect') {
                         li.innerHTML = `
-                            <div class="font-bold text-gray-700 mb-1">Q. ${item.question}</div>
-                            <div class="text-amber-700 bg-amber-100 inline-block px-2 py-0.5 rounded text-xs">
+                            <div class="font-bold text-gray-700 mb-1 text-xs">${item.question}</div>
+                            <div class="text-amber-700 bg-amber-100 inline-block px-2 py-0.5 rounded text-[10px] font-bold">
                                 A. ${item.answer}
                             </div>
                         `;
                     } else {
                         li.innerHTML = `
-                            <div class="font-bold text-gray-700 mb-1">Q. ${item.question}</div>
-                            <div class="flex flex-col gap-1 text-xs">
-                                <span class="text-blue-600">🤵‍♂️ ${item.maleAnswer}</span>
-                                <span class="text-pink-600">👰‍♀️ ${item.femaleAnswer}</span>
+                            <div class="font-bold text-gray-700 mb-1 text-xs">${item.question}</div>
+                            <div class="flex flex-col gap-1 text-[10px]">
+                                <span class="text-blue-600 font-medium">🤵‍♂️ ${item.maleAnswer}</span>
+                                <span class="text-pink-600 font-medium">👰‍♀️ ${item.femaleAnswer}</span>
                             </div>
                         `;
                     }
@@ -777,7 +789,6 @@
             renderMatchList(data.details.exactMatches, 'perfect-match-list', 'perfect');
             renderMatchList(data.details.textureMatches, 'texture-match-list', 'texture');
 
-            // Tarot
             const mTarot = tarotMap[mDom];
             const fTarot = tarotMap[fDom];
             
@@ -816,8 +827,135 @@
             });
         }
 
-        renderQuestions();
+        document.getElementById('random-btn').addEventListener('click', () => {
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            const groups = {}; 
+            document.querySelectorAll('input[type="radio"]').forEach(r => {
+                if(!groups[r.name]) groups[r.name] = [];
+                groups[r.name].push(r);
+            });
+            Object.values(groups).forEach(options => {
+                const random = options[Math.floor(Math.random() * options.length)];
+                random.checked = true;
+                if(random.getAttribute('onchange')) random.dispatchEvent(new Event('change'));
+            });
+            setTimeout(() => {
+                const dynGroups = {};
+                document.querySelectorAll('.dynamic-area input[type="radio"]').forEach(r => {
+                     if(!dynGroups[r.name]) dynGroups[r.name] = [];
+                     dynGroups[r.name].push(r);
+                });
+                Object.values(dynGroups).forEach(options => {
+                    const random = options[Math.floor(Math.random() * options.length)];
+                    random.checked = true;
+                });
+            }, 100);
+        });
+
+        document.getElementById('calculate-btn').addEventListener('click', () => {
+            const scores = { sim: 0, pref: 0, shape: 0 };
+            const details = { exactMatches: [], textureMatches: [] };
+            const maleCounts = {}, femaleCounts = {};
+            
+            let exactMatchCount = 0; 
+
+            questions.forEach(q => {
+                const m = document.querySelector(`input[name="${q.id}-me-male"]:checked`);
+                const f = document.querySelector(`input[name="${q.id}-me-female"]:checked`);
+                
+                if(m && f) {
+                    const mGroup = getGroup(m.dataset.tag);
+                    const fGroup = getGroup(f.dataset.tag);
+                    if(mGroup) maleCounts[mGroup] = (maleCounts[mGroup]||0)+1;
+                    if(fGroup) femaleCounts[fGroup] = (femaleCounts[fGroup]||0)+1;
+                    
+                    if(q.type === 'similarity') {
+                        if(m.value === f.value) { 
+                            scores.sim += 4; 
+                            exactMatchCount++; 
+                            details.exactMatches.push({
+                                question: q.text,
+                                answer: m.dataset.text.trim()
+                            });
+                        } 
+                        else if(mGroup === fGroup) { 
+                            scores.sim += 3; 
+                            details.textureMatches.push({
+                                question: q.text,
+                                maleAnswer: m.dataset.text.trim(),
+                                femaleAnswer: f.dataset.text.trim()
+                            });
+                        }
+                    }
+                    
+                    if(q.type === 'crossover') {
+                        const mp = document.querySelector(`input[name="${q.id}-partner-male"]:checked`);
+                        const fp = document.querySelector(`input[name="${q.id}-partner-female"]:checked`);
+                        let prefScore = 0;
+                        if(mp && mp.value === f.value) { prefScore += 8; }
+                        if(fp && fp.value === m.value) { prefScore += 8; }
+                        scores.pref += prefScore;
+                        
+                        if(mp && mp.value === f.value && fp && fp.value === m.value) {
+                             exactMatchCount++; 
+                             details.exactMatches.push({
+                                question: q.text_me,
+                                answer: `서로가 원하는 바가 정확히 일치`
+                            });
+                        }
+                    }
+                    if(q.type === 'dynamic') {
+                        const mf = document.querySelector(`input[name="${q.id}-followup-male"]:checked`);
+                        const ff = document.querySelector(`input[name="${q.id}-followup-female"]:checked`);
+                        let dScore = 0;
+                        if(mf && mf.value === f.value) dScore += parseInt(mf.dataset.score||4);
+                        if(ff && ff.value === m.value) dScore += parseInt(ff.dataset.score||4);
+                        scores.pref += dScore;
+                    }
+                }
+            });
+
+            let probability;
+            if (exactMatchCount === 0) {
+                probability = 100; 
+            } else {
+                probability = Math.pow(0.25, exactMatchCount) * 100;
+            }
+            
+            let probabilityText = probability.toFixed(2) + "%";
+            if (probability < 0.0001) {
+                 probabilityText = "0.0001% 미만의 기적"; 
+            } else if (probability < 0.01) {
+                 probabilityText = probability.toFixed(4) + "%";
+            } else if (probability < 1) {
+                 probabilityText = probability.toFixed(3) + "%";
+            }
+
+            const finalSim = Math.min(100, (scores.sim / 40) * 100); 
+            const finalPref = Math.min(100, (scores.pref / 80) * 100); 
+            
+            let diffSq = 0;
+            const groups = Object.keys(sensoryProfiles);
+            groups.forEach(g => {
+                const mVal = (maleCounts[g]||0), fVal = (femaleCounts[g]||0);
+                diffSq += Math.pow(mVal - fVal, 2);
+            });
+            const finalShape = Math.max(0, 100 - (Math.sqrt(diffSq) * 10)); 
+            const totalScore = (finalShape * 0.7) + (finalSim * 0.15) + (finalPref * 0.15);
+            
+            showResults({
+                total: Math.round(totalScore),
+                maleCounts, femaleCounts,
+                details,
+                probabilityText,
+                exactMatchCount
+            });
+        });
+
         document.getElementById('retry-btn').addEventListener('click', () => location.reload());
+        
+        // 초기 실행
+        renderQuestions();
     </script>
 </body>
 </html>
